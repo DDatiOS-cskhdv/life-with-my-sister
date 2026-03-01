@@ -25,6 +25,11 @@ jobs:
       - name: Install Cordova
         run: npm install -g cordova
 
+      - name: Clean old platforms
+        run: |
+          rm -rf platforms
+          rm -rf plugins
+
       - name: Add iOS platform
         run: cordova platform add ios
 
@@ -38,17 +43,24 @@ jobs:
             -configuration Release \
             -sdk iphoneos \
             build \
-            CODE_SIGNING_ALLOWED=NO \
-            ASSETCATALOG_COMPILER_APPICON_NAME=AppIcon
+            CODE_SIGNING_ALLOWED=NO
 
       # 🔥
-      - name: Create IPA
+      - name: Locate .app and Create IPA
         run: |
-          cd platforms/ios
+          echo "Searching for built .app..."
+          APP_PATH=$(find ~/Library/Developer/Xcode/DerivedData -name "*.app" -type d | head -1)
+
+          if [ -z "$APP_PATH" ]; then
+            echo "No .app found!"
+            exit 1
+          fi
+
+          echo "Found app at $APP_PATH"
+
           mkdir Payload
-          cp -r build/Release-iphoneos/*.app Payload/
+          cp -r "$APP_PATH" Payload/
           zip -r "$BUNDLE_ID.ipa" Payload
-          mv "$BUNDLE_ID.ipa" ../../
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4
