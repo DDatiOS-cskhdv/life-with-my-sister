@@ -266,6 +266,9 @@ QJ.VB.showFastForwardButton = function() {
  */
 (function(){
   "use strict";
+  if (typeof Utils !== 'undefined' && Utils.isMobileSafari && Utils.isMobileSafari()) {
+    return;
+  }
 
   const LOWSCALE = 0.5;          // scaleResolution === true 时采用的缩放倍率
   const INCLUDE_PICTURES = true; // 是否把图片层(常见弹幕/特效)也纳入低分辨率
@@ -434,6 +437,11 @@ QJ.VB.showFastForwardButton = function() {
 
 // 低画质模式警告
 QJ.MPMZ.tl.lowResModeWarning = function() {
+   if (typeof Utils !== 'undefined' && Utils.isMobileSafari && Utils.isMobileSafari()) {
+     ConfigManager.scaleResolution = false;
+     ConfigManager.save();
+     return;
+   }
    if (!ConfigManager.scaleResolution ) {
 	 if ( ConfigManager.scaleResolution == undefined )  ConfigManager.scaleResolution = false;
 	   
