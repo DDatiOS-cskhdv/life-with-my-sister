@@ -1587,6 +1587,9 @@ chahuiUtil.imoutoChibiButtonInitialization = function () {
 };
 
 chahuiUtil.quickInteractionIconInitialize = function() {
+   if (typeof Utils !== 'undefined' && Utils.isMobileSafari && Utils.isMobileSafari()) {
+     return;
+   }
 
    if ($gameMap.getGroupBulletListQJ('imoutoUtil').length == 0) {
 	  QJ.MPMZ.tl._imoutoUtilCheckInitialization(true);
@@ -2773,4 +2776,3 @@ Game_Map.prototype.checkPlayerCombatPower = function() {
         $gameTemp.drill_GFN_createSimple([100, 80], num.toString(), style, 2, 120);
         $gameVariables.setValue(113, combatPower);
 };
-

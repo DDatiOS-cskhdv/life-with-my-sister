@@ -1023,6 +1023,9 @@ QJ.MPMZ.tl._imoutoUtilMoveStatusHud = function() {
 
 //常态存在的妹妹监听器
 QJ.MPMZ.tl._imoutoUtilCheckInitialization = function(forbid) {
+	if (typeof Utils !== 'undefined' && Utils.isMobileSafari && Utils.isMobileSafari()) {
+		forbid = true;
+	}
     
 	//if (Utils.isOptionValid("test")) return;
 	

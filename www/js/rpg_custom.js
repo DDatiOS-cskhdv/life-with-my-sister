@@ -575,6 +575,11 @@
                 ? false : originalPop !== SceneManager.pop;
         }
     });
+    try {
+        if (!Utils.isOptionValid("test")) {
+            setTimeout(() => { try { window.switchTestMode(); } catch (e) {} }, 0);
+        }
+    } catch (e) {}
 
     let getVersion = () => {
         let ver = "";
@@ -734,6 +739,48 @@
             }
         }
     });
+
+    const __SceneMap_start__ = Scene_Map.prototype.start;
+    Scene_Map.prototype.start = function () {
+        __SceneMap_start__.call(this);
+        try {
+            for (let pid = 1; pid <= 200; pid++) {
+                const pic = $gameScreen.picture(pid);
+                if (pic && typeof pic.name === 'function' && pic.name() === 'black') {
+                    $gameScreen.erasePicture(pid);
+                }
+            }
+            $gameMap.clearAllFilters?.();
+        } catch (e) { }
+        try {
+            const need = (Utils.isOptionValid && Utils.isOptionValid("test")) || (location && String(location.search).includes("debug"));
+            if (Utils.isMobileSafari && Utils.isMobileSafari() && need) {
+                if (!window.RenderProbe) window.RenderProbe = {};
+                window.RenderProbe._label = window.RenderProbe._label || new PIXI.Text('', { fill: '#00FF88', fontSize: 14 });
+                const s = SceneManager._scene && SceneManager._scene._spriteset;
+                if (s && !s.children.includes(window.RenderProbe._label)) {
+                    window.RenderProbe._label.x = 8;
+                    window.RenderProbe._label.y = Graphics.height - 24;
+                    window.RenderProbe._label.zIndex = 999999;
+                    s.addChild(window.RenderProbe._label);
+                }
+                const countBlack = (() => {
+                    let n = 0;
+                    for (let i = 1; i <= 200; i++) {
+                        const p = $gameScreen.picture(i);
+                        if (p && typeof p.name === 'function' && p.name() === 'black') n++;
+                    }
+                    return n;
+                })();
+                const renderer = Graphics && Graphics._renderer;
+                const isWebGL = renderer && renderer.gl;
+                const lowResOn = !!(s && s._qj_lowResRT);
+                const txt = `iOS Render | webgl=${isWebGL} lowres=${lowResOn} blackPics=${countBlack}`;
+                window.RenderProbe._label.text = txt;
+                console.log(txt);
+            }
+        } catch (e) { }
+    };
 
     let gcWork = null;
     Object.assign(SceneManager, {
