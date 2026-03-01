@@ -13,6 +13,29 @@
 </head>
 
 <body style="background-color:#000">
+    <script>
+        (function() {
+            var log = [];
+            function showError(msg) {
+                log.push(msg);
+                var el = document.getElementById('_err');
+                if (!el) {
+                    el = document.createElement('div');
+                    el.id = '_err';
+                    el.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.92);color:#ff4444;font:13px monospace;padding:12px;overflow:auto;z-index:99999;white-space:pre-wrap;word-break:break-all;';
+                    document.body.appendChild(el);
+                }
+                el.textContent = log.join('\n\n');
+            }
+            window.onerror = function(msg, src, line, col, err) {
+                showError('[JS ERROR]\n' + msg + '\nat ' + src + ':' + line + ':' + col + (err ? '\n' + err.stack : ''));
+                return false;
+            };
+            window.addEventListener('unhandledrejection', function(e) {
+                showError('[UNHANDLED PROMISE]\n' + (e.reason ? (e.reason.stack || e.reason) : e));
+            });
+        })();
+    </script>
     <script src="js/main.js"></script>
 </body>
 

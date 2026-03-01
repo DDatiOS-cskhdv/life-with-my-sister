@@ -187,23 +187,22 @@
         return {
             ios() {
                 function onDeviceReady() {
-                    const root = window.cordova.file.applicationDirectory + 'www/';
-                    window.cdvUrl = root;
-                    console.log('Global cdvUrl (iOS) =', window.cdvUrl);
+                    // WKWebView serves www/ via app://localhost/ — file:// URLs are blocked cross-origin.
+                    // Use empty cdvUrl so all scripts load via relative paths from the local server.
+                    window.cdvUrl = '';
+                    console.log('[OK] iOS using relative paths via WKWebView local server');
 
-                    loadScript.seq([
-                        ...[...pixiList, ...otherList, ...rpgCoreList]
-                            .map(path => window.cdvUrl + path)
-                    ]).then(() => {
-                        loadPlugins();
-                        console.log('[OK] iOS scripts loaded via seq', endTime());
-                    }).catch(err => {
-                        alert('[ERR] iOS seq load error: ' + err);
-                    }).finally(() => {
-                        scriptReload = null;
-                        loadScript = null;
-                        init = null;
-                    });
+                    loadScript.seq([...pixiList, ...otherList, ...rpgCoreList])
+                        .then(() => {
+                            loadPlugins();
+                            console.log('[OK] iOS scripts loaded via seq', endTime());
+                        }).catch(err => {
+                            alert('[ERR] iOS load error: ' + err);
+                        }).finally(() => {
+                            scriptReload = null;
+                            loadScript = null;
+                            init = null;
+                        });
                 }
 
                 const script = document.createElement('script');
