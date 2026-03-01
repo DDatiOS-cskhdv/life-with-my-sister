@@ -3,59 +3,24 @@
     xmlns="http://www.w3.org/ns/widgets"
     xmlns:cdv="http://cordova.apache.org/ns/1.0">
 
-    <name>A Simple Life with My Unobtrusive Sister</name>
-    <description>A Simple Life with My Unobtrusive Sister - RPG Game</description>
+    <name>SimpleLifeWithSister</name>
+    <description>Simple Life with sister RPG Game</description>
     <author email="datthuongGK00@gmail.com" href="https://tinysweet.qzz.io/">Developer</author>
 
     <content src="index.html" />
 
     <access origin="*" />
-    <allow-intent href="http://*/*" />
-    <allow-intent href="https://*/*" />
     <allow-navigation href="*" />
 
-    <!-- iOS -->
     <platform name="ios">
-        <preference name="DisallowOverscroll" value="true" />
-        <preference name="EnableViewportScale" value="false" />
-        <preference name="MediaPlaybackRequiresUserAction" value="false" />
-        <preference name="AllowInlineMediaPlayback" value="true" />
-        <preference name="BackupWebStorage" value="none" />
-        <preference name="UIWebViewDecelerationSpeed" value="fast" />
+        <preference name="deployment-target" value="13.0" />
         <preference name="WKWebViewOnly" value="true" />
-        <preference name="scheme" value="app" />
-        <preference name="hostname" value="localhost" />
         <preference name="Orientation" value="landscape" />
         <preference name="Fullscreen" value="true" />
-        <preference name="AutoHideSplashScreen" value="true" />
-        <preference name="FadeSplashScreen" value="false" />
-        <edit-config target="NSCameraUsageDescription" file="*-Info.plist" mode="merge">
-            <string>This app does not require camera access.</string>
-        </edit-config>
+        <preference name="AllowInlineMediaPlayback" value="true" />
+        <preference name="MediaPlaybackRequiresUserAction" value="false" />
     </platform>
 
-    <!-- Android -->
-    <platform name="android">
-        <preference name="Orientation" value="landscape" />
-        <preference name="Fullscreen" value="true" />
-        <preference name="LoadUrlTimeoutValue" value="700000" />
-        <preference name="AndroidLaunchMode" value="singleTop" />
-    </platform>
-
-    <!-- Global preferences -->
     <preference name="Orientation" value="landscape" />
     <preference name="Fullscreen" value="true" />
-    <preference name="SplashScreenDelay" value="0" />
-    <preference name="BackgroundColor" value="0xff000000" />
-    <preference name="LoadUrlTimeoutValue" value="700000" />
-
-    <!-- Required plugins -->
-    <plugin name="cordova-plugin-file" spec="^7.0.0" />
-    <plugin name="cordova-plugin-media" spec="^6.0.0" />
-    <plugin name="cordova-plugin-device" spec="^2.0.3" />
-    <plugin name="cordova-plugin-splashscreen" spec="^6.0.0" />
-
-    <!-- Icon -->
-    <icon src="www/icon/icon.png" />
-
 </widget>
