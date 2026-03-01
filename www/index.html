@@ -66,16 +66,43 @@
     <script>
         (function() {
             var log = [];
-            function showError(msg) {
-                log.push(msg);
+            var minimized = false;
+            function getPanel() {
                 var el = document.getElementById('_err');
                 if (!el) {
                     el = document.createElement('div');
                     el.id = '_err';
-                    el.style.cssText = 'position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.92);color:#ff4444;font:13px monospace;padding:12px;overflow:auto;z-index:99999;white-space:pre-wrap;word-break:break-all;';
+                    el.style.cssText = 'position:fixed;bottom:8px;left:8px;width:320px;max-height:180px;background:rgba(0,0,0,0.85);color:#ff5555;font:11px monospace;border:1px solid #ff4444;border-radius:6px;z-index:99999;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.7);';
+                    var header = document.createElement('div');
+                    header.style.cssText = 'display:flex;justify-content:space-between;align-items:center;padding:3px 6px;background:#550000;cursor:pointer;user-select:none;';
+                    var title = document.createElement('span');
+                    title.textContent = '⚠ JS Errors';
+                    title.style.cssText = 'color:#ff9999;font-weight:bold;font-size:11px;';
+                    var btns = document.createElement('span');
+                    var btnMin = document.createElement('button');
+                    btnMin.textContent = '−';
+                    btnMin.style.cssText = 'background:none;border:none;color:#ff9999;font-size:14px;cursor:pointer;padding:0 4px;line-height:1;';
+                    var btnClose = document.createElement('button');
+                    btnClose.textContent = '×';
+                    btnClose.style.cssText = 'background:none;border:none;color:#ff9999;font-size:16px;cursor:pointer;padding:0 4px;line-height:1;';
+                    var body = document.createElement('div');
+                    body.id = '_err_body';
+                    body.style.cssText = 'padding:6px;overflow:auto;max-height:150px;white-space:pre-wrap;word-break:break-all;font-size:10px;';
+                    btnMin.onclick = function(e) { e.stopPropagation(); minimized = !minimized; body.style.display = minimized ? 'none' : 'block'; btnMin.textContent = minimized ? '+' : '−'; el.style.maxHeight = minimized ? 'none' : '180px'; };
+                    btnClose.onclick = function(e) { e.stopPropagation(); el.style.display = 'none'; };
+                    btns.appendChild(btnMin); btns.appendChild(btnClose);
+                    header.appendChild(title); header.appendChild(btns);
+                    el.appendChild(header); el.appendChild(body);
                     document.body.appendChild(el);
                 }
-                el.textContent = log.join('\n\n');
+                return el;
+            }
+            function showError(msg) {
+                log.push(msg);
+                var el = getPanel();
+                el.style.display = '';
+                var body = document.getElementById('_err_body');
+                if (body) { body.textContent = log.join('\n\n'); body.scrollTop = body.scrollHeight; }
             }
             window.onerror = function(msg, src, line, col, err) {
                 showError('[JS ERROR]\n' + msg + '\nat ' + src + ':' + line + ':' + col + (err ? '\n' + err.stack : ''));

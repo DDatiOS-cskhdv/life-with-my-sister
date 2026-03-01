@@ -197,6 +197,20 @@
                             // Force isNwjs()=false on iOS: prevents NW.js code paths in plugins
                             // and makes StorageManager use localStorage instead of fake fs
                             if (typeof Utils !== 'undefined') Utils.isNwjs = function() { return false; };
+                            // Patch Decrypter: re-encoded .rpgmvo files have VER=000000 instead of 000301
+                            // Fix bytes 9-10 in-place before the header check so decryption succeeds
+                            if (typeof Decrypter !== 'undefined') {
+                                const _origDecrypt = Decrypter.decryptArrayBuffer.bind(Decrypter);
+                                Decrypter.decryptArrayBuffer = function(ab) {
+                                    if (ab) {
+                                        const v = new Uint8Array(ab);
+                                        if (v[0]===0x52&&v[1]===0x50&&v[2]===0x47&&v[3]===0x4d&&v[4]===0x56&&v[9]===0x00&&v[10]===0x00) {
+                                            v[9]=0x03; v[10]=0x01;
+                                        }
+                                    }
+                                    return _origDecrypt(ab);
+                                };
+                            }
                             loadPlugins();
                             console.log('[OK] iOS scripts loaded via seq', endTime());
                         }).catch(err => {
