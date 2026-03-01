@@ -652,6 +652,89 @@
     });
     window.DISABLE_AUTO_UPDATE = true;
 
+    const __ls_mem__ = {};
+    let __ls_ok__ = true;
+    try {
+        const k = "__rmmz_test__";
+        localStorage.setItem(k, "1");
+        localStorage.removeItem(k);
+    } catch (e) {
+        __ls_ok__ = false;
+    }
+    function __ls_get__(k) {
+        if (__ls_ok__) return localStorage.getItem(k);
+        return Object.prototype.hasOwnProperty.call(__ls_mem__, k) ? __ls_mem__[k] : null;
+    }
+    function __ls_set__(k, v) {
+        if (__ls_ok__) {
+            try { localStorage.setItem(k, v); return; } catch (e) {}
+        }
+        __ls_mem__[k] = v;
+    }
+    function __ls_rm__(k) {
+        if (__ls_ok__) {
+            try { localStorage.removeItem(k); return; } catch (e) {}
+        }
+        delete __ls_mem__[k];
+    }
+    Object.assign(StorageManager, {
+        saveToWebStorage(savefileId, json) {
+            const key = this.webStorageKey(savefileId);
+            const data = LZString.compressToBase64(json);
+            __ls_set__(key, data);
+        },
+        loadFromWebStorage(savefileId) {
+            const key = this.webStorageKey(savefileId);
+            const data = __ls_get__(key);
+            return LZString.decompressFromBase64(data);
+        },
+        webStorageExists(savefileId) {
+            const key = this.webStorageKey(savefileId);
+            return !!__ls_get__(key);
+        },
+        webStorageBackupExists(savefileId) {
+            const key = this.webStorageKey(savefileId) + "bak";
+            return !!__ls_get__(key);
+        },
+        removeWebStorage(savefileId) {
+            const key = this.webStorageKey(savefileId);
+            __ls_rm__(key);
+        },
+        backup(savefileId) {
+            if (this.exists(savefileId)) {
+                if (this.isLocalMode()) {
+                    const data = this.loadFromLocalFile(savefileId);
+                    const compressed = LZString.compressToBase64(data);
+                    const fs = require('fs');
+                    const dirPath = this.localFileDirectoryPath();
+                    const filePath = this.localFilePath(savefileId) + ".bak";
+                    if (!fs.existsSync(dirPath)) {
+                        fs.mkdirSync(dirPath);
+                    }
+                    fs.writeFileSync(filePath, compressed);
+                } else {
+                    const data = this.loadFromWebStorage(savefileId);
+                    const compressed = LZString.compressToBase64(data);
+                    const key = this.webStorageKey(savefileId) + "bak";
+                    __ls_set__(key, compressed);
+                }
+            }
+        },
+        cleanBackup(savefileId) {
+            if (this.backupExists(savefileId)) {
+                if (this.isLocalMode()) {
+                    const fs = require('fs');
+                    const dirPath = this.localFileDirectoryPath();
+                    const filePath = this.localFilePath(savefileId);
+                    fs.unlinkSync(filePath + ".bak");
+                } else {
+                    const key = this.webStorageKey(savefileId);
+                    __ls_rm__(key + "bak");
+                }
+            }
+        }
+    });
+
     let gcWork = null;
     Object.assign(SceneManager, {
         // 避免報錯中止音頻播放
